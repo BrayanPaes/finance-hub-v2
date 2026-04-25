@@ -1,4 +1,5 @@
 require('dotenv').config();
+const userRoutes = require('./routes/userRoutes')
 
 const requiredEnv = ['DB_HOST', 'DB_USER', 'DB_PASS', 'DB_NAME', 'DB_PORT'];
 
@@ -18,6 +19,7 @@ const app = express();
 //Middlewares
 app.use(cors());
 app.use(express.json());
+app.use('/api/users', userRoutes);
 
 //Test Database Connection
 async function testConnection() {
