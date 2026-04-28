@@ -1,5 +1,6 @@
 require('dotenv').config();
 const userRoutes = require('./routes/userRoutes')
+const transactionRoutes = require('./routes/transactionRoutes');
 
 const requiredEnv = ['DB_HOST', 'DB_USER', 'DB_PASS', 'DB_NAME', 'DB_PORT'];
 
@@ -20,6 +21,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use('/api/users', userRoutes);
+app.use('/api/transactions', transactionRoutes);
 
 //Test Database Connection
 async function testConnection() {
