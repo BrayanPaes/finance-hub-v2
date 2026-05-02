@@ -4,9 +4,15 @@ exports.getTransaction = async (req, res) => {
     try {
         const userId = req.user.id;
 
-        res.json({ message: `Access granted! This is the protected area for user ID:` })
+        const [transaction] = await pool.query(
+            'SELECT * FROM transactions WHERE user_id = ?',
+            [userId]
+        );
+
+        res.json(transaction);
     } catch (error) {
-        res.status(500).json({ error: 'Internal server error.' });
+        console.error(error.message);
+        res.status(500).json({ error: 'Server error while fetching transactions.' });
     }
 };
 
