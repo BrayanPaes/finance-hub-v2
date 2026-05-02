@@ -48,22 +48,47 @@ exports.createTransaction = async (req, res) => {
 exports.deleteTransaction = async (req, res) => {
     try {
 
-    const transactionId = req.params.id;
+        const transactionId = req.params.id;
+        const userId = req.user.id; 
 
-    const userId = req.user.id; 
-
-    const [result] = await pool.query(
-        'DELETE FROM transactions WHERE id = ? AND user_id = ?',
-        [transactionId, userId]
+        const [result] = await pool.query(
+            'DELETE FROM transactions WHERE id = ? AND user_id = ?',
+            [transactionId, userId]
     );
 
     if (result.affectedRows === 0) {
         return res.status(404).json({ error: 'Transaction not found or not authorized.' });
     }
-    
+
     res.json({ message: 'Transaction deleted sucessfully.' });
     } catch (error) {
         console.error(error.message);
         res.status(500).json({ error: 'Server error while deleting transaction.' });
+    }
+};
+
+
+
+exports.updateTransaction = async (req, res) => {
+    
+    const transactionId = req.params.id;
+    const userId = req.user.id;
+
+    const { description, amount, type, date } = req.body;
+
+    try {
+        const [result] = await pool.query(
+        'UPDATE transactions SET description = ?, amount = ?, type = ?, date = ? WHERE id = ? AND user_id = ?',
+        [description, amount, type, date, transactionId, userId]
+    );
+
+    if (result.affectedRows === 0) {
+        return res.status(404).json({ error: 'Transaction not found or not authorized.' });
+    }
+
+    res.json({ message: 'Transaction updated sucessfully.' });
+    } catch (error) {
+        console.error(error.message);
+        res.status(500).json({ error: 'Server error while updating transaction.' });
     }
 };
