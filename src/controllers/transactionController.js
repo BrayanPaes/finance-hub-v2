@@ -16,6 +16,7 @@ exports.getTransaction = async (req, res) => {
     }
 };
 
+
 exports.createTransaction = async (req, res) => {
     const { description, amount, type, date } = req.body;
     const userId = req.user.id; 
@@ -40,5 +41,29 @@ exports.createTransaction = async (req, res) => {
     } catch (error) {
         console.error(error.message);
         res.status(500).json({ error: 'Server error while creating transaction.' });
+    }
+};
+
+
+exports.deleteTransaction = async (req, res) => {
+    try {
+
+    const transactionId = req.params.id;
+
+    const userId = req.user.id; 
+
+    const [result] = await pool.query(
+        'DELETE FROM transactions WHERE id = ? AND user_id = ?',
+        [transactionId, userId]
+    );
+
+    if (result.affectedRows === 0) {
+        return res.status(404).json({ error: 'Transaction not found or not authorized.' });
+    }
+    
+    res.json({ message: 'Transaction deleted sucessfully.' });
+    } catch (error) {
+        console.error(error.message);
+        res.status(500).json({ error: 'Server error while deleting transaction.' });
     }
 };
