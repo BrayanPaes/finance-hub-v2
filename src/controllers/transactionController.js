@@ -92,3 +92,27 @@ exports.updateTransaction = async (req, res) => {
         res.status(500).json({ error: 'Server error while updating transaction.' });
     }
 };
+
+exports.getBalance = async (req, res) => {
+    try {
+        const userId = req.user.id;
+
+        const [rows] = await pool.query(
+            `SELECT 
+                SUM(CASE WHEN type = 'income' THEN amount ELSE 0 END) AS totalIncome,
+                SUM(CASE WHEN type = 'expense' THEN amount ELSE 0 END) AS totalExpense
+             FROM transactions 
+             WHERE user_id = ?`,
+            [userId]
+        );
+
+        const totalIncome = Number(rows[0].totalIncome) || 0;
+        const totalExpense = Number(rows[0].totalExpense) || 0;
+        const balance = totalIncome - totalExpense;
+
+        res.json({ totalIncome, totalExpense, balance });
+    } catch (error) {
+        console.error(error.message);
+        res.status(500).json({ error: 'Server error while calculating balance.' });
+    }
+};
