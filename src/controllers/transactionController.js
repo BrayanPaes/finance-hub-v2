@@ -21,6 +21,18 @@ exports.createTransaction = async (req, res) => {
     const { description, amount, type, date } = req.body;
     const userId = req.user.id; 
 
+    if (!description || !amount || !type) {
+        return res.status(400).json({ error: 'Description, amount and type are required.' });
+    }
+    
+    if (typeof amount !== 'number') {
+        return res.status(400).json({ error: 'Amount must be a number.' });
+    }
+
+    if (type !== 'income' && type !== 'expense') {
+        return res.status(400).json({ error: 'Type must be "income" or "expense".' });
+    }
+
     const transactionDate = date || new Date();
 
     try {
