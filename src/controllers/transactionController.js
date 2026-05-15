@@ -1,15 +1,23 @@
 const pool = require('../config/db');
 
-exports.getTransaction = async (req, res) => {
+exports.getTransactions = async (req, res) => {
     try {
         const userId = req.user.id;
 
-        const [transaction] = await pool.query(
-            'SELECT * FROM transactions WHERE user_id = ?',
-            [userId]
-        );
+        const { type } = req.query;
 
-        res.json(transaction);
+        let sql = 'SELECT * FROM transactions WHERE user_id = ?';
+        const values = [userId];
+
+        if (type) {
+            sql += ' AND type = ?';
+            values.push(type);
+        }
+
+        sql += ' ORDER BY date DESC';
+
+        const [rows] = await pool.query(sql, values);
+        res.json(rows);
     } catch (error) {
         console.error(error.message);
         res.status(500).json({ error: 'Server error while fetching transactions.' });
